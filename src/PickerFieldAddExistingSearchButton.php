@@ -3,7 +3,7 @@
 namespace TheWebmen\PickerField\Controllers;
 
 use SilverStripe\ORM\SS_List;
-use SilverStripe\View\ArrayData;
+use SilverStripe\Model\ArrayData;
 use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchButton;
 use Symbiote\GridFieldExtensions\GridFieldExtensions;
 
