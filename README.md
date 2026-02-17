@@ -15,6 +15,39 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=catch-design_catch-oss-silverstripe-pickerfield&metric=sqale_rating)](https://sonarcloud.io/component_measures?id=catch-design_catch-oss-silverstripe-pickerfield)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=catch-design_catch-oss-silverstripe-pickerfield&metric=vulnerabilities)](https://sonarcloud.io/component_measures?id=catch-design_catch-oss-silverstripe-pickerfield)
 
-GridField based management of has_one, has_many, and many_many relationship selection.
+A flexible picker field for Silverstripe CMS that provides GridField-based record selection with search, add existing, and inline editing capabilities. Supports has_one and many_many relationships.
 
-Silverstripe 4 version of: https://github.com/briceburg/silverstripe-pickerfield
+## Compatibility
+
+| Version | Silverstripe | PHP |
+|---------|-------------|-----|
+| release/6 | ^6.0 | ^8.5 |
+| release/5 | ^5.1 | ~8.4 |
+
+## Installation
+
+```bash
+composer require thewebmen/silverstripe-pickerfield
+```
+
+## Usage
+
+### Many-Many Picker
+
+```php
+use TheWebmen\PickerField\Controllers\PickerField;
+
+$field = PickerField::create('Tags', 'Tags', $this->Tags());
+```
+
+### Has-One Picker
+
+```php
+use TheWebmen\PickerField\Controllers\HasOnePickerField;
+
+$field = HasOnePickerField::create($this, 'RelatedID', 'Related Item', $this->Related());
+```
+
+## License
+
+See [LICENSE](LICENSE) file.
