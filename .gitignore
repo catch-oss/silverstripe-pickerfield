@@ -7,3 +7,16 @@
 
 #### General
 .DS_Store
+
+#### Composer
+vendor/
+
+#### PHPUnit
+.phpunit.cache
+
+#### Recipe-plugin generated files
+app/
+public/
+.htaccess
+index.php
+web.config
