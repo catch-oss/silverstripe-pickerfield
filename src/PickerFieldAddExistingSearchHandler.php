@@ -2,23 +2,28 @@
 
 namespace TheWebmen\PickerField\Controllers;
 
-use SilverStripe\ORM\PaginatedList;
-use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchHandler;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\PaginatedList;
+use SilverStripe\ORM\SS_List;
+use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchHandler;
 
-class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHandler {
+class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHandler
+{
+	private static array $allowed_actions = [
+		'index',
+		'add',
+		'SearchForm',
+	];
 
-	private static $allowed_actions = array(
-			'index',
-			'add',
-			'SearchForm'
-	);
-
-	public function add($request) {
+	public function add($request): void
+	{
 		// use native GridFieldAddExistingSearchHandler add() method when not has_one
-		if(!$this->grid->isHaveOne()) { return parent::add($request); }
+		if (!$this->grid->isHaveOne()) {
+			parent::add($request);
+			return;
+		}
 
-		if(!$id = $request->postVar('id')) {
+		if (!$id = $request->postVar('id')) {
 			$this->httpError(400);
 		}
 
@@ -28,21 +33,22 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 		$this->grid->childObject->write();
 	}
 
-	public function doSearch($data, $form) {
+	public function doSearch($data, $form): mixed
+	{
 		$list = $this->context->getQuery($data, false, false, $this->getSearchList());
 		$list = $this->applySearchFilters($list);
 		$list = $list->subtract($this->grid->getList());
 		$list = new PaginatedList($list, $this->request);
 
-		$data = $this->customise(array(
-				'SearchForm' => $form,
-				'Items'      => $list
-		));
+		$data = $this->customise([
+			'SearchForm' => $form,
+			'Items'      => $list,
+		]);
 		return $data->index();
 	}
 
-
-	public function Items() {
+	public function Items(): PaginatedList
+	{
 		$list = $this->getSearchList();
 		$list = $this->applySearchFilters($list);
 		$list = $list->subtract($this->grid->getList());
@@ -51,17 +57,23 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 		return $list;
 	}
 
-	public function getSearchList() {
-		$component	= $this->grid->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
+	public function getSearchList(): SS_List
+	{
+		$component = $this->grid->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
 
 		return $component->getSearchList() ?: DataList::create($this->grid->getList()->dataClass());
 	}
 
-	public function applySearchFilters($list){
-		$component	= $this->grid->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
+	public function applySearchFilters(SS_List $list): SS_List
+	{
+		$component = $this->grid->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
 
-		if($filters = $component->getSearchFilters())	{ $list = $list->filter($filters); }
-		if($excludes = $component->getSearchExcludes())	{ $list = $list->exclude($excludes); }
+		if ($filters = $component->getSearchFilters()) {
+			$list = $list->filter($filters);
+		}
+		if ($excludes = $component->getSearchExcludes()) {
+			$list = $list->exclude($excludes);
+		}
 
 		return $list;
 	}

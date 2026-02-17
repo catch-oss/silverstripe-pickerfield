@@ -15,8 +15,9 @@ use SilverStripe\ORM\SS_List;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use Symbiote\GridFieldExtensions\GridFieldTitleHeader;
 
-class PickerField extends GridField {
-	protected $isHaveOne = false;
+class PickerField extends GridField
+{
+	protected bool $isHaveOne = false;
 
 	/**
 	 * Usage [e.g. in getCMSFields]
@@ -28,8 +29,9 @@ class PickerField extends GridField {
 	 * @param string $linkExistingTitle - AddExisting Button Title
 	 * @param string $sortField         - Field to sort on. Be sure it exists in the $many_many_extraFields static
 	 */
-	public function __construct($name, $title = null, SS_List $dataList = null, $linkExistingTitle = null, $sortField = null) {
-		$config = GridfieldConfig::create()->addComponents(
+	public function __construct(string $name, ?string $title = null, ?SS_List $dataList = null, ?string $linkExistingTitle = null, ?string $sortField = null)
+	{
+		$config = GridFieldConfig::create()->addComponents(
 			new GridFieldButtonRow('before'),
 			new GridFieldToolbarHeader(),
 			new GridFieldDataColumns(),
@@ -39,83 +41,85 @@ class PickerField extends GridField {
 			new PickerFieldDeleteAction()
 		);
 
-		if($sortField)
-		{
+		if ($sortField) {
 			$config->addComponent(new GridFieldOrderableRows($sortField));
 		}
 
-		if(!$linkExistingTitle)
-		{
+		if (!$linkExistingTitle) {
 		    $dataClassName = array_values(array_slice(explode("\\", $dataList->dataClass()), -1))[0];
 			$linkExistingTitle = ($this->isHaveOne()) ?
-				'Select a ' . $dataClassName :		// singular [has_one]
-				'Select ' . $dataClassName . '(s)';	// plural [has_many, many_many]
+				'Select a ' . $dataClassName :
+				'Select ' . $dataClassName . '(s)';
 		}
 
 		$config->getComponentByType(PickerFieldAddExistingSearchButton::class)->setTitle($linkExistingTitle);
 
-		return parent::__construct($name, $title, $dataList, $config);
+		parent::__construct($name, $title, $dataList, $config);
 	}
 
-	public function isHaveOne(){
+	public function isHaveOne(): bool
+	{
 		return $this->isHaveOne;
 	}
 
-	public function setSearchFilters($filters) {
+	public function setSearchFilters(array $filters): static
+	{
 		$this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)
 			->setSearchFilters($filters);
 
 		return $this;
 	}
 
-	public function setSearchExcludes($excludes) {
+	public function setSearchExcludes(array $excludes): static
+	{
 		$this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)
 			->setSearchExcludes($excludes);
 
 		return $this;
 	}
 
-	/**
-	 * @param SS_List $list List to search on
-	 * @return $this
-	 */
-	public function setSearchList(SS_List $list) {
+	public function setSearchList(SS_List $list): static
+	{
 		$this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)
 			->setSearchList($list);
 
 		return $this;
 	}
 
-	public function getSearchFilters() {
+	public function getSearchFilters(): ?array
+	{
 		return $this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)
 			->getSearchFilters();
 	}
 
-	public function getSearchExcludes() {
+	public function getSearchExcludes(): ?array
+	{
 		return $this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)
 			->getSearchExcludes();
 	}
 
-	/**
-	 * @return SS_List
-	 */
-	public function getSearchLIst() {
+	public function getSearchList(): ?SS_List
+	{
 		return $this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)
 			->getSearchList();
 	}
 
-	public function enableCreate($button_title = null) {
+	public function enableCreate(?string $button_title = null): static
+	{
 	    $this->addDetailForm();
 
 	    $button = new GridFieldAddNewButton('buttons-before-left');
-	    if($button_title) $button->setButtonName($button_title);
+	    if ($button_title) {
+	        $button->setButtonName($button_title);
+	    }
 
 	    $this->config->addComponent($button);
 
 	    return $this;
 	}
 
-	public function enableEdit() {
+	public function enableEdit(): static
+	{
 	    $this->addDetailForm();
 
 	    $this->config->addComponent(new GridFieldEditButton());
@@ -123,22 +127,22 @@ class PickerField extends GridField {
 	    return $this;
 	}
 
-
-	public function setSelectTitle($title) {
+	public function setSelectTitle(string $title): static
+	{
 	    $this->config->getComponentByType(PickerFieldAddExistingSearchButton::class)->setTitle($title);
 
 	    return $this;
 	}
 
-	private function addDetailForm(){
-
-	    if($this->config->getComponentByType(GridFieldDetailForm::class))
+	private function addDetailForm(): void
+	{
+	    if ($this->config->getComponentByType(GridFieldDetailForm::class)) {
 	        return;
+	    }
 
 	    $form = new GridFieldDetailForm();
 	    $form->setItemRequestClass(PickerFieldEditHandler::class);
 
-
-	    return $this->config->addComponent($form);
+	    $this->config->addComponent($form);
 	}
 }
