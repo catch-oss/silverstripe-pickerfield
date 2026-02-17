@@ -13,7 +13,7 @@ class PickerFieldDeleteAction extends GridFieldDeleteAction
 		parent::__construct(true); // unlink vs. delete selected objects
 	}
 
-	public function handleAction(GridField $gridField, $actionName, $arguments, $data): void
+	public function handleAction(GridField $gridField, $actionName, $arguments, $data)
 	{
 		// use native GridFieldDeleteAction handleAction() method when !has_one
 		if (!$gridField->isHaveOne()) {

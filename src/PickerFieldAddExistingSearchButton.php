@@ -2,8 +2,8 @@
 
 namespace TheWebmen\PickerField\Controllers;
 
-use SilverStripe\ORM\SS_List;
 use SilverStripe\Model\ArrayData;
+use SilverStripe\Model\List\SS_List;
 use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchButton;
 use Symbiote\GridFieldExtensions\GridFieldExtensions;
 
@@ -11,9 +11,9 @@ class PickerFieldAddExistingSearchButton extends GridFieldAddExistingSearchButto
 {
 	protected ?array $searchFilters = null;
 	protected ?array $searchExcludes = null;
-	protected ?SS_List $searchList = null;
+	protected $searchList = null;
 
-	public function handleSearch($grid, $request): PickerFieldAddExistingSearchHandler
+	public function handleSearch($grid, $request)
 	{
 		return new PickerFieldAddExistingSearchHandler($grid, $this);
 	}
@@ -28,9 +28,10 @@ class PickerFieldAddExistingSearchButton extends GridFieldAddExistingSearchButto
 		$this->searchExcludes = $excludes;
 	}
 
-	public function setSearchList(SS_List $list): void
+	public function setSearchList(SS_List $list)
 	{
 		$this->searchList = $list;
+		return $this;
 	}
 
 	public function getSearchFilters(): ?array
@@ -43,12 +44,12 @@ class PickerFieldAddExistingSearchButton extends GridFieldAddExistingSearchButto
 		return $this->searchExcludes;
 	}
 
-	public function getSearchList(): ?SS_List
+	public function getSearchList()
 	{
 		return $this->searchList;
 	}
 
-	public function getHTMLFragments($grid): array
+	public function getHTMLFragments($grid)
 	{
 		GridFieldExtensions::include_requirements();
 
