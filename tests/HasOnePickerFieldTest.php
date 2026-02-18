@@ -96,6 +96,19 @@ class HasOnePickerFieldTest extends SapphireTest
         $this->assertSame('Choose Related Item', $button->getTitle());
     }
 
+    public function testConstructorHandlesNullCurrentHasOne(): void
+    {
+        // Given a parent object with no existing has_one record set
+        $parent = $this->objFromFixture(TestDataObject::class, 'parent1');
+
+        // When we create a HasOnePickerField with null for currentHasOne
+        $field = HasOnePickerField::create($parent, 'RelatedID', 'Related', null);
+
+        // Then the field should be created successfully with an empty list
+        $this->assertCount(0, $field->getList());
+        $this->assertSame(TestRelatedObject::class, $field->getModelClass());
+    }
+
     public function testListContainsCurrentHasOneRecord(): void
     {
         // Given a parent with an existing has_one relationship to related1
