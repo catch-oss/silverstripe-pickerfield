@@ -1,0 +1,22 @@
+TheWebmen\PickerField\Tests\TestRelatedObject:
+  related1:
+    Title: 'Related One'
+  related2:
+    Title: 'Related Two'
+
+TheWebmen\PickerField\Tests\TestTagObject:
+  tag1:
+    Title: 'Tag One'
+  tag2:
+    Title: 'Tag Two'
+  tag3:
+    Title: 'Tag Three'
+
+TheWebmen\PickerField\Tests\TestDataObject:
+  parent1:
+    Title: 'Parent One'
+    Related: =>TheWebmen\PickerField\Tests\TestRelatedObject.related1
+    Tags: =>TheWebmen\PickerField\Tests\TestTagObject.tag1,=>TheWebmen\PickerField\Tests\TestTagObject.tag2
+  parent2:
+    Title: 'Parent Two'
+    Related: =>TheWebmen\PickerField\Tests\TestRelatedObject.related2

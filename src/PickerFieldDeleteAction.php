@@ -4,18 +4,22 @@ namespace TheWebmen\PickerField\Controllers;
 
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
 
-class PickerFieldDeleteAction extends GridFieldDeleteAction {
-
-	public function __construct() {
+class PickerFieldDeleteAction extends GridFieldDeleteAction
+{
+	public function __construct()
+	{
 		parent::__construct(true); // unlink vs. delete selected objects
 	}
 
-
-	public function handleAction(GridField $gridField, $actionName, $arguments, $data) {
+	public function handleAction(GridField $gridField, $actionName, $arguments, $data)
+	{
 		// use native GridFieldDeleteAction handleAction() method when !has_one
-		if(!$gridField->isHaveOne()) { return parent::handleAction($gridField, $actionName, $arguments, $data); }
+		if (!$gridField->isHaveOne()) {
+			parent::handleAction($gridField, $actionName, $arguments, $data);
+			return;
+		}
 
 		// appropriate handling of has_one relationships [so as not to delete the object]
 		$childProperty = $gridField->getName();
@@ -24,6 +28,4 @@ class PickerFieldDeleteAction extends GridFieldDeleteAction {
 
 		$gridField->setList(ArrayList::create());
 	}
-
-
 }
