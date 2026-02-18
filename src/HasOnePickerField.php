@@ -23,7 +23,7 @@ class HasOnePickerField extends PickerField
 	public function __construct(DataObject $childObject, string $name, ?string $title = null, ?DataObject $currentHasOne = null, ?string $linkExistingTitle = null)
 	{
 		$modelClass = $childObject->getRelationClass(str_replace('ID', '', $name));
-		if (!$modelClass) {
+		if (!$modelClass && $currentHasOne) {
 			$modelClass = $currentHasOne->className;
 		}
 

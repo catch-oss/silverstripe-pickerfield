@@ -46,7 +46,7 @@ class PickerField extends GridField
 		}
 
 		if (!$linkExistingTitle) {
-		    $dataClassName = array_values(array_slice(explode("\\", $dataList->dataClass()), -1))[0];
+		    $dataClassName = basename(str_replace('\\', '/', $dataList->dataClass()));
 			$linkExistingTitle = ($this->isHaveOne()) ?
 				'Select a ' . $dataClassName :
 				'Select ' . $dataClassName . '(s)';
