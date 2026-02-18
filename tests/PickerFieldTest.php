@@ -11,6 +11,7 @@ use SilverStripe\Forms\GridField\GridFieldEditButton;
 use SilverStripe\Forms\GridField\GridFieldPaginator;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\ORM\DataList;
+use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 use Symbiote\GridFieldExtensions\GridFieldTitleHeader;
 use TheWebmen\PickerField\Controllers\PickerField;
 use TheWebmen\PickerField\Controllers\PickerFieldAddExistingSearchButton;
@@ -178,6 +179,28 @@ class PickerFieldTest extends SapphireTest
         $this->assertSame($field, $result, 'setSelectTitle returns $this for chaining');
         $button = $field->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
         $this->assertSame('Pick Items', $button->getTitle());
+    }
+
+    public function testConstructorWithSortFieldAddsOrderableRows(): void
+    {
+        $parent = $this->objFromFixture(TestDataObject::class, 'parent1');
+        $field = PickerField::create('Tags', 'Tags', $parent->Tags(), null, 'Sort');
+
+        $this->assertNotNull(
+            $field->getConfig()->getComponentByType(GridFieldOrderableRows::class),
+            'GridFieldOrderableRows should be added when sortField is provided'
+        );
+    }
+
+    public function testConstructorWithoutSortFieldHasNoOrderableRows(): void
+    {
+        $parent = $this->objFromFixture(TestDataObject::class, 'parent1');
+        $field = PickerField::create('Tags', 'Tags', $parent->Tags());
+
+        $this->assertNull(
+            $field->getConfig()->getComponentByType(GridFieldOrderableRows::class),
+            'GridFieldOrderableRows should not be present without sortField'
+        );
     }
 
     public function testDetailFormUsesPickerFieldEditHandler(): void

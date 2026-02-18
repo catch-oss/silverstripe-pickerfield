@@ -20,4 +20,10 @@ class TestDataObject extends DataObject implements TestOnly
     private static array $many_many = [
         'Tags' => TestTagObject::class,
     ];
+
+    private static array $many_many_extraFields = [
+        'Tags' => [
+            'Sort' => 'Int',
+        ],
+    ];
 }

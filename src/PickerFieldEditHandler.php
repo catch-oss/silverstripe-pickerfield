@@ -30,7 +30,7 @@ class PickerFieldEditHandler extends GridFieldDetailForm_ItemRequest
 	        $this->record->write();
 	    } catch (ValidationException $e) {
 	        $controller = $this->getToplevelController();
-	        $form->sessionMessage($e->getResult()->message(), 'bad');
+	        $form->sessionMessage($e->getMessage(), 'bad');
 	        $responseNegotiator = new PjaxResponseNegotiator([
 	            'CurrentForm' => function () use (&$form) {
 	                return $form->forTemplate();
