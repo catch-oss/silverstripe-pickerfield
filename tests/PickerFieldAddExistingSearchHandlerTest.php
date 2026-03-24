@@ -178,6 +178,71 @@ class PickerFieldAddExistingSearchHandlerTest extends SapphireTest
         $this->assertCount(1, $items);
     }
 
+    /**
+     * Regression test: doSearch() must pass null (not false) as the $limit
+     * parameter to SearchContext::getQuery(). In SS6, false is coerced to 0,
+     * producing LIMIT 0 in SQL — zero results always returned.
+     *
+     * Tests the query logic directly since doSearch() renders a template
+     * that requires a full form/controller context.
+     */
+    public function testSearchQueryReturnsResultsWithNullLimit(): void
+    {
+        // Given a search context for TestTagObject with a search term
+        $parent = $this->objFromFixture(TestDataObject::class, 'parent2');
+        $field = PickerField::create('Tags', 'Tags', $parent->Tags());
+        $button = $field->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
+        $handler = new PickerFieldAddExistingSearchHandler($field, $button);
+
+        // Get the search context (same one doSearch uses)
+        $context = singleton(TestTagObject::class)->getDefaultSearchContext();
+        $method = new ReflectionMethod($handler, 'getSearchList');
+        $searchList = $method->invoke($handler);
+
+        // When we query with null limit (the fix) — should return results
+        $results = $context->getQuery(['Title' => 'Tag'], false, null, $searchList);
+        $this->assertGreaterThan(0, $results->count(), 'null limit should return matching results');
+        $this->assertSame(3, $results->count(), 'All 3 tags should match "Tag"');
+    }
+
+    /**
+     * Verify that false as limit produces LIMIT 0 (the bug we fixed).
+     * This documents the SS6 type coercion behavior.
+     */
+    public function testSearchQueryWithFalseLimitReturnsZeroResults(): void
+    {
+        $context = singleton(TestTagObject::class)->getDefaultSearchContext();
+        $searchList = TestTagObject::get();
+
+        // false is coerced to int(0) by SS6's int|array|null type hint → LIMIT 0
+        $results = $context->getQuery(['Title' => 'Tag'], false, false, $searchList);
+        $this->assertSame(0, $results->count(), 'false limit should produce LIMIT 0 (the bug)');
+    }
+
+    /**
+     * Verify search results exclude already-linked records after subtract.
+     */
+    public function testSearchQueryExcludesAlreadyLinkedRecords(): void
+    {
+        // Given parent1 with tag1 and tag2 already linked
+        $parent = $this->objFromFixture(TestDataObject::class, 'parent1');
+        $field = PickerField::create('Tags', 'Tags', $parent->Tags());
+        $button = $field->getConfig()->getComponentByType(PickerFieldAddExistingSearchButton::class);
+        $handler = new PickerFieldAddExistingSearchHandler($field, $button);
+
+        $context = singleton(TestTagObject::class)->getDefaultSearchContext();
+        $method = new ReflectionMethod($handler, 'getSearchList');
+        $searchList = $method->invoke($handler);
+
+        // When we search for "Tag" and subtract already-linked records
+        $results = $context->getQuery(['Title' => 'Tag'], false, null, $searchList);
+        $results = $results->subtract($field->getList());
+
+        // Then only Tag Three should remain
+        $this->assertSame(1, $results->count());
+        $this->assertSame('Tag Three', $results->first()->Title);
+    }
+
     public function testAddForManyManyAddsRecord(): void
     {
         // Given parent2 with no tags linked
