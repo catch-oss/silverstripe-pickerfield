@@ -7,6 +7,7 @@ use SilverStripe\Model\List\PaginatedList;
 use SilverStripe\Model\List\SS_List;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Search\SearchContext;
 use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchHandler;
 
 class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHandler
@@ -58,7 +59,18 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 		// LastEdited) from applying impossible constraints with default bounds.
 		$data = array_filter($data, fn($v) => $v !== '' && $v !== null);
 
-		$list = $this->context->getQuery($data, false, null, $this->getSearchList());
+		// Use a plain SearchContext instead of SiteTreeSearchContext to avoid
+		// Versioned subquery bugs triggered by FilterClass + ClassName filters.
+		// The picker doesn't need page status filtering or draft stage handling.
+		unset($data['FilterClass']);
+		$modelClass = $this->grid->getModelClass();
+		$context = SearchContext::create(
+			$modelClass,
+			$this->context->getSearchFields(),
+			$this->context->getFilters()
+		);
+
+		$list = $context->getQuery($data, false, null, $this->getSearchList());
 		$list = $this->applySearchFilters($list);
 		$list = $list->subtract($this->grid->getList());
 		$list = new PaginatedList($list, $this->request);
