@@ -2,9 +2,12 @@
 
 namespace TheWebmen\PickerField\Controllers;
 
+use SilverStripe\Forms\TextField;
 use SilverStripe\Model\List\PaginatedList;
 use SilverStripe\Model\List\SS_List;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\Search\SearchContext;
 use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchHandler;
 
 class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHandler
@@ -14,6 +17,24 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 		'add',
 		'SearchForm',
 	];
+
+	public function SearchForm()
+	{
+		$form = parent::SearchForm();
+
+		// The general search field 'q' is scaffolded as a HiddenField by DataObject.
+		// Replace it with a visible TextField so users can search by title etc.
+		$modelClass = $this->grid->getModelClass();
+		$generalFieldName = DataObject::singleton($modelClass)->getGeneralSearchFieldName();
+		if ($generalFieldName && $form->Fields()->dataFieldByName($generalFieldName)) {
+			$form->Fields()->replaceField(
+				$generalFieldName,
+				TextField::create($generalFieldName, _t('GridFieldExtensions.SEARCH', 'Search'))
+			);
+		}
+
+		return $form;
+	}
 
 	public function add($request)
 	{
@@ -34,7 +55,22 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 
 	public function doSearch($data, $form)
 	{
-		$list = $this->context->getQuery($data, false, null, $this->getSearchList());
+		// Strip empty values to prevent filters (e.g. WithinRangeFilter for
+		// LastEdited) from applying impossible constraints with default bounds.
+		$data = array_filter($data, fn($v) => $v !== '' && $v !== null);
+
+		// Use a plain SearchContext instead of SiteTreeSearchContext to avoid
+		// Versioned subquery bugs triggered by FilterClass + ClassName filters.
+		// The picker doesn't need page status filtering or draft stage handling.
+		unset($data['FilterClass']);
+		$modelClass = $this->grid->getModelClass();
+		$context = SearchContext::create(
+			$modelClass,
+			$this->context->getSearchFields(),
+			$this->context->getFilters()
+		);
+
+		$list = $context->getQuery($data, false, null, $this->getSearchList());
 		$list = $this->applySearchFilters($list);
 		$list = $list->subtract($this->grid->getList());
 		$list = new PaginatedList($list, $this->request);
