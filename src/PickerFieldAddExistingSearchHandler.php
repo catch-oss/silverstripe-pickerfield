@@ -2,9 +2,11 @@
 
 namespace TheWebmen\PickerField\Controllers;
 
+use SilverStripe\Forms\TextField;
 use SilverStripe\Model\List\PaginatedList;
 use SilverStripe\Model\List\SS_List;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
 use Symbiote\GridFieldExtensions\GridFieldAddExistingSearchHandler;
 
 class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHandler
@@ -14,6 +16,24 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 		'add',
 		'SearchForm',
 	];
+
+	public function SearchForm()
+	{
+		$form = parent::SearchForm();
+
+		// The general search field 'q' is scaffolded as a HiddenField by DataObject.
+		// Replace it with a visible TextField so users can search by title etc.
+		$modelClass = $this->grid->getModelClass();
+		$generalFieldName = DataObject::singleton($modelClass)->getGeneralSearchFieldName();
+		if ($generalFieldName && $form->Fields()->dataFieldByName($generalFieldName)) {
+			$form->Fields()->replaceField(
+				$generalFieldName,
+				TextField::create($generalFieldName, _t('GridFieldExtensions.SEARCH', 'Search'))
+			);
+		}
+
+		return $form;
+	}
 
 	public function add($request)
 	{
