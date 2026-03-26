@@ -54,6 +54,10 @@ class PickerFieldAddExistingSearchHandler extends GridFieldAddExistingSearchHand
 
 	public function doSearch($data, $form)
 	{
+		// Strip empty values to prevent filters (e.g. WithinRangeFilter for
+		// LastEdited) from applying impossible constraints with default bounds.
+		$data = array_filter($data, fn($v) => $v !== '' && $v !== null);
+
 		$list = $this->context->getQuery($data, false, null, $this->getSearchList());
 		$list = $this->applySearchFilters($list);
 		$list = $list->subtract($this->grid->getList());
