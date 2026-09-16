@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - `SilverStripe\View\ArrayData` to `SilverStripe\Model\ArrayData`
   - `SilverStripe\ORM\ValidationException` to `SilverStripe\Core\Validation\ValidationException`
 - Updated `symbiote/silverstripe-gridfieldextensions` dependency to ^5.0
+- CI tests against MySQL 8.4; requires SilverStripe ^6.2 (release/6.2 branch); guzzle/symfony-mime advisories cleared in the lock
 
 ### Added
 - Comprehensive test suite (43 tests, 75 assertions, ~70% coverage)
