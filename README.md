@@ -44,12 +44,13 @@ PickerField solves both by providing a search-and-select interface backed by Gri
 
 | Version | Silverstripe | PHP |
 |---------|-------------|-----|
+| release/6.2 | ^6.2 | ^8.5 |
 | release/6 | ^6.0 | ^8.5 |
 | release/5 | ^5.1 | ~8.4 |
 
 ## Requirements
 
-- `silverstripe/framework` ^6.0
+- `silverstripe/framework` ^6.2
 - `symbiote/silverstripe-gridfieldextensions` ^5.0
 
 ## Installation
